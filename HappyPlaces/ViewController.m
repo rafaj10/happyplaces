@@ -20,11 +20,6 @@
     [super viewDidLoad];
     
     _venueQueue = [NSMutableArray new];
-
-    [[ApiRequestManager sharedApi] searchWithVenueType:DefaultVenuesEntryTypeFourSquare newMidiasBlock:^(NSArray *venues) {
-        NSLog(@"Venues list %@",venues);
-        [self venueListToQueue:venues];
-    }];
     
     _locationManager = [CLLocationManager new];
     _locationManager.delegate = self;
@@ -40,14 +35,20 @@
     // Dispose of any resources that can be recreated.
 }
 
--(void) venueListToQueue:(NSArray *)venueList{
+-(void) venueListToQueue:(NSArray *)venueList withPriority:(long)priority{
     
     [_venueQueue addObject:venueList];
 
-    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+    dispatch_async(dispatch_get_global_queue(priority, 0), ^{
 
+        float i = 0;
+        
         for (DefaultVenues * venue in venueList) {
-            [self makePinWithDefaultVenue:venue];
+            //TODO FAZER GRADATIVO countar segundo +
+            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, i * NSEC_PER_SEC), dispatch_get_main_queue(), ^{
+                [self makePinWithDefaultVenue:venue];
+            });
+            i += 0.2;
         }
         
     });
@@ -89,6 +90,17 @@
                                                                  zoom:12];
     _mapView = [GMSMapView mapWithFrame:CGRectZero camera:camera];
     self.view = _mapView;
+    
+    [[ApiRequestManager sharedApi] searchWithVenueType:DefaultVenuesEntryTypeFourSquare currentLocation:@{@"lat":[NSNumber numberWithFloat:newLocation.coordinate.latitude],@"lng":[NSNumber numberWithFloat:newLocation.coordinate.longitude]} newMidiasBlock:^(NSArray *venues) {
+        NSLog(@"Sushi Venues list %@",venues);
+        [self venueListToQueue:venues withPriority:DISPATCH_QUEUE_PRIORITY_HIGH];
+    }];
+    
+    [[ApiRequestManager sharedApi] searchWithVenueType:DefaultVenuesEntryTypeFourSquareChurras currentLocation:@{@"lat":[NSNumber numberWithFloat:newLocation.coordinate.latitude],@"lng":[NSNumber numberWithFloat:newLocation.coordinate.longitude]} newMidiasBlock:^(NSArray *venues) {
+        NSLog(@"Churras Venues list %@",venues);
+        [self venueListToQueue:venues withPriority:DISPATCH_QUEUE_PRIORITY_LOW];
+    }];
+    
 }
 
 @end

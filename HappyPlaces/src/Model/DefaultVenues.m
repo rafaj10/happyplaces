@@ -17,6 +17,7 @@
         _entryType=entryType;
         switch (entryType) {
             case DefaultVenuesEntryTypeFourSquare:
+            case DefaultVenuesEntryTypeFourSquareChurras:
                 [self populateFourSquareModel:response];
                 break;
         }

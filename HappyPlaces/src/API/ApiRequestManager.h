@@ -11,13 +11,16 @@
 
 typedef enum {
     DefaultVenuesEntryTypeFourSquare,
-    DefaultVenuesEntryTypeGooglePlace
+    DefaultVenuesEntryTypeGooglePlace,
+    DefaultVenuesEntryTypeFourSquareChurras
 } DefaultVenuesEntryType;
 
 @interface ApiRequestManager : NSObject
 
 + (ApiRequestManager *)sharedApi;
 
-- (void)searchWithVenueType:(DefaultVenuesEntryType)entryType newMidiasBlock:(void (^)(NSArray *venues))newVenues;
+- (void)searchWithVenueType:(DefaultVenuesEntryType)entryType
+            currentLocation:(NSDictionary *)locations
+             newMidiasBlock:(void (^)(NSArray *venues))newVenues;
 
 @end
