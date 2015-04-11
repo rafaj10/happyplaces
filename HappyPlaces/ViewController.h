@@ -7,9 +7,14 @@
 //
 
 #import <UIKit/UIKit.h>
+#import <CoreLocation/CoreLocation.h>
+#import <GoogleMaps/GoogleMaps.h>
 
-@interface ViewController : UIViewController
+@interface ViewController : UIViewController <CLLocationManagerDelegate>
 
+@property(strong,nonatomic) CLLocationManager *locationManager;
+@property(strong,nonatomic) GMSMapView *mapView;
+@property(strong,nonatomic) NSMutableArray *venueQueue;
 
 @end
 
